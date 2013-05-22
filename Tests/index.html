@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title>Grapher Test Graphs</title>
+	<script type="text/javascript" src="../raphael.min.js"></script>
+	<script type="text/javascript" src="../grapher.js"></script>
+</head>
+<body>
+	<h1>Grapher Test Suite</h1>
+	<div id="test" style="background:#DAE4FF;height:400px">
+		
+	</div>
+	<script type="text/javascript">
+		var paper = Raphael("test", 400, 400);
+		//var c = paper.circle(50,49,49);
+		var data = new Array(50,25,25,100,20,40,25,90,50);
+		var labels = new Array("One","Two","Three","Four","Five","Six","Seven","Eight","Nine")
+		var pie = paper.drawPie(300,300,100,data,labels);
+		//c.attr("stroke","#fff");
+	</script>
+</body>
+</html>
