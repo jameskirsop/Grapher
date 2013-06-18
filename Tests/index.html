@@ -3,19 +3,46 @@
 	<title>Grapher Test Graphs</title>
 	<script type="text/javascript" src="../raphael.min.js"></script>
 	<script type="text/javascript" src="../grapher.js"></script>
+	<script type="text/javascript" src="jquery.js"></script>
+	<style type="text/css">
+		div.testContainer{
+			background:#DAE4FF;
+			height:300px;
+			margin:20px;
+			width:600px;
+		}
+	</style>
 </head>
 <body>
 	<h1>Grapher Test Suite</h1>
-	<div id="test" style="background:#DAE4FF;height:400px">
+	<h3>Pie Chart</h3>
+	<div id="test" class="testContainer">
+		
+	</div>
+
+	<h3>Line Chart</h3>
+	<div id="lineGraph" class="testContainer">
 		
 	</div>
 	<script type="text/javascript">
-		var paper = Raphael("test", 400, 400);
-		//var c = paper.circle(50,49,49);
+		var paper = Raphael("test", 600, 300);
 		var data = new Array(50,25,25,100,20,40,25,90,50);
 		var labels = new Array("One","Two","Three","Four","Five","Six","Seven","Eight","Nine")
 		var pie = paper.drawPie(300,300,100,data,labels);
-		//c.attr("stroke","#fff");
+
+		var lineGraphPaper = Raphael("lineGraph",600,300);
+		var ticketsWeekly_stats = new Array();
+		var ticketsWeekly_labels = new Array();
+		$.ajax({type: "GET",url: "lineGraph.xml",dataType: "xml",
+			success: function(xml){
+				$(xml).find("statistic").each(function(){
+					ticketsWeekly_stats.push($(this).find("openTickets").text());
+					ticketsWeekly_labels.push($(this).find("date").text());
+				});
+				lineGraphPaper.drawGraph($("#lineGraph").width(),300,ticketsWeekly_labels,ticketsWeekly_stats,30);
+			}
+		});
+
 	</script>
 </body>
 </html>

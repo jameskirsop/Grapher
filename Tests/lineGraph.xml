@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<statistics>
+	<statistic>
+		<date>12/06</date>
+		<openTickets>40</openTickets>
+	</statistic>
+	<statistic>
+		<date>13/06</date>
+		<openTickets>40</openTickets>
+	</statistic>
+	<statistic>
+		<date>14/06</date>
+		<openTickets>30</openTickets>
+	</statistic>
+	<statistic>
+		<date>15/06</date>
+		<openTickets>31</openTickets>
+	</statistic>
+	<statistic>
+		<date>16/06</date>
+		<openTickets>36</openTickets>
+	</statistic>
+	<statistic>
+		<date>17/06</date>
+		<openTickets>35</openTickets>
+	</statistic>
+	<statistic>
+		<date>18/06</date>
+		<openTickets>42</openTickets>
+	</statistic>
+</statistics>
