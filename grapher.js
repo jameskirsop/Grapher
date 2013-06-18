@@ -2,7 +2,6 @@
 	By James Kirsop - 2013
 	Functions for Extending the functionality of Raphael to generate graphs
 */
-
 	var aColors = new Array("b80043", "c85437", "32b9cd", "b44bb0", "ffea00", "b292d3", "2fd0c8", "face0a", "2267dd", "39c64c", "ff6600", "f20733", "25dacb", "c23d6e", "e718e3", "01feb2", "4cc33c", "51d8f0", "5cdf11", "00eaff", "ac21de", "ff0000", "33b2cc", "4330cf");
 	
 	Raphael.fn.drawGraph = function(containerWidth,containerHeight,labels,values,gutter){
@@ -14,7 +13,14 @@
 
 		this.drawGrid(width,height,values.length,5,gutter);
 
-		var verticalScale = height/Math.max.apply(Math,values);
+		var maxValue = Math.max.apply(Math,values);
+		while((maxValue % 5) !== 0){
+			maxValue++;
+		}
+		var verticalScale = height/maxValue;
+
+		// alert(Math.max.apply(Math,values));
+		// alert(verticalScale);
 		var pointHorizontalDistance=width/(values.length-1);
 
 		/* Horizontal Axis Labels */
@@ -24,7 +30,7 @@
 		}
 		/* Vertical Axis Labels */
 		for(var i=0;i<=5;i++){
-			var vertLabel = this.text(gutter/2,(height-i*(height/5))+gutter,(i*(Math.max.apply(Math,values))/5));
+			var vertLabel = this.text(gutter/2,(height-i*(height/5))+gutter,(i*(maxValue)/5));
 			vertLabel.attr({"font-size":14});
 		}
 	
@@ -100,8 +106,6 @@
 			} else if (thisDegree >= 250 && thisDegree <= 305) {
 				addY = -radius/5;
 			};
-
-			//for(var a=1;(a*50)<=containerHeight;a++){
 			if((i*35)<=containerHeight){
 				var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
 				key.attr({"fill":colours[i],"stroke-width":0});
