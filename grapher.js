@@ -3,6 +3,7 @@
 	Functions for Extending the functionality of Raphael to generate graphs
 */
 	var aColors = new Array("b80043", "c85437", "32b9cd", "b44bb0", "ffea00", "b292d3", "2fd0c8", "face0a", "2267dd", "39c64c", "ff6600", "f20733", "25dacb", "c23d6e", "e718e3", "01feb2", "4cc33c", "51d8f0", "5cdf11", "00eaff", "ac21de", "ff0000", "33b2cc", "4330cf");
+	
 	Raphael.fn.drawGraph = function(containerWidth,containerHeight,labels,values,gutter){
 		var container = this.rect(0,0,containerWidth,containerHeight);
 		container.attr({"stroke-width":0});
