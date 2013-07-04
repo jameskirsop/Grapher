@@ -58,6 +58,8 @@
 	}
 
 	/* drawPie 
+	* Draws segments of a pie for as long as they're available or there's space to place elements in the key.
+	*
 	* Takes the following arguments:
 	* containerWidth = Width of the element in number of pixels the pie chart will reside in
 	* containerHeight = Height of the element in number of pixels the pie chart will reside in
@@ -70,39 +72,33 @@
 		for (var i = 0; i <= values.length-1; i++) {
 			totalOfValues = totalOfValues + (values[i] * 1);
 		};
-		var iOriginX = (containerWidth/2);
+		var iOriginX = containerWidth/2;
 		var iOriginY = containerHeight/2;
 		var prevDegree = 0;
-		var valuesCount = 0;
-		var bigBalloon = 0;
+		var currentValue = 0;
 		for (var i = 0; i <= values.length-1; i++) {
-			var colorIndex = Math.floor(Math.random() * (aColors.length - 1 +1) + 0);
-			valuesCount = valuesCount + (values[i] * 1);
-			var thisDegree = (valuesCount/totalOfValues) * 360;
+			currentValue = currentValue + (values[i] * 1);
+			var thisDegree = (currentValue/totalOfValues) * 360;
 			path=this.path("M"+iOriginX+" "+iOriginY+"L"
 				+(iOriginX+(radius*Math.cos(thisDegree * Math.PI/180)))+" "
-				+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 "+bigBalloon+" 0 "
+				+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 0 "
 				+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
 				+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
 			path.attr({"fill":"#"+aColors[i],"stroke":"#C0C0C0","stroke-width":1});
-			addX = 0;
-			addY = 0;
-			if (thisDegree <= 45 || thisDegree >= 315) {
-				addX = radius/2;
-			} else if (thisDegree >= 135 && thisDegree <= 225) {
-				addX = -radius/2;
-			};
-			if (thisDegree >= 45 && thisDegree <= 135) {
-				addY = radius/5;
-			} else if (thisDegree >= 250 && thisDegree <= 305) {
-				addY = -radius/5;
-			};
+
 			if((i*35)<=containerHeight){
 				var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
 				key.attr({"fill":aColors[i],"stroke-width":0});
 				var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),labels[i]+ " - "+values[i]);
 				text.attr({"font-size":15,"text-anchor":"start"});
-				var prevDegree = (valuesCount/totalOfValues) * 360;
+				var prevDegree = (currentValue/totalOfValues) * 360;
+			} else {
+				var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
+				key.attr({"fill":aColors[i],"stroke-width":0});
+				var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),labels[i]+ " - "+values[i]);
+				text.attr({"font-size":15,"text-anchor":"start"});
+				/* Remove this line to create an 'other' segment */
+				var prevDegree = (currentValue/totalOfValues) * 360;
 			}
 		};
 	}
