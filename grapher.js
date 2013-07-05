@@ -76,31 +76,42 @@
 		var iOriginY = containerHeight/2;
 		var prevDegree = 0;
 		var currentValue = 0;
+		var otherValue = 0;
 		for (var i = 0; i <= values.length-1; i++) {
 			currentValue = currentValue + (values[i] * 1);
 			var thisDegree = (currentValue/totalOfValues) * 360;
-			path=this.path("M"+iOriginX+" "+iOriginY+"L"
-				+(iOriginX+(radius*Math.cos(thisDegree * Math.PI/180)))+" "
-				+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 0 "
-				+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
-				+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
-			path.attr({"fill":"#"+aColors[i],"stroke":"#C0C0C0","stroke-width":1});
-
+			var iLastValue;
 			if((i*35)<=containerHeight){
-				var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
-				key.attr({"fill":aColors[i],"stroke-width":0});
-				var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),labels[i]+ " - "+values[i]);
-				text.attr({"font-size":15,"text-anchor":"start"});
+				this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,radius,i);
+				this.drawKey(this,iOriginX,iOriginY,radius,i,i,labels[i],values[i]);
 				var prevDegree = (currentValue/totalOfValues) * 360;
+				iLastValue = i;
 			} else {
-				var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
-				key.attr({"fill":aColors[i],"stroke-width":0});
-				var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),labels[i]+ " - "+values[i]);
-				text.attr({"font-size":15,"text-anchor":"start"});
-				/* Remove this line to create an 'other' segment */
-				var prevDegree = (currentValue/totalOfValues) * 360;
+				otherValue = otherValue + values[i];
+				if(i == values.length-1){
+					this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,radius,i);
+					this.drawKey(this,iOriginX,iOriginY,radius,iLastValue+1,i,"Other",otherValue);
+					var prevDegree = (currentValue/totalOfValues) * 360;
+				}
+				
 			}
 		};
+	}
+
+	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,thisDegree,prevDegree,radius,i){
+		path=graph.path("M"+iOriginX+" "+iOriginY+"L"
+			+(iOriginX+(radius*Math.cos(thisDegree * Math.PI/180)))+" "
+			+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 0 "
+			+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
+			+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
+		path.attr({"fill":"#"+aColors[i],"stroke":"#C0C0C0","stroke-width":1});
+	}
+
+	Raphael.fn.drawKey = function(graph, iOriginX, iOriginY,radius,i,color,label,value){
+		var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
+			key.attr({"fill":aColors[color],"stroke-width":0});
+			var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),label+ " - "+value);
+			text.attr({"font-size":15,"text-anchor":"start"});
 	}
 
 	/* Raphael function to draw a grid for the graph */
