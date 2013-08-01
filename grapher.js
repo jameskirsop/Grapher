@@ -26,10 +26,7 @@
 
 		this.drawGrid(width,height,values.length,5,gutter);
 
-		var maxValue = Math.max.apply(Math,values);
-		while((maxValue % 5) !== 0){
-			maxValue++;
-		}
+		var maxValue = Math.ceil(Math.max.apply(Math,values) / 5) * 5;
 		var verticalScale = height/maxValue;
 		var pointHorizontalDistance=width/(values.length-1);
 
@@ -87,7 +84,7 @@
 				var prevDegree = (currentValue/totalOfValues) * 360;
 				iLastValue = i;
 			} else {
-				otherValue = otherValue + values[i];
+				otherValue = otherValue + (values[i] * 1);
 				if(i == values.length-1){
 					this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,radius,i);
 					this.drawKey(this,iOriginX,iOriginY,radius,iLastValue+1,i,"Other",otherValue);
