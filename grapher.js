@@ -79,7 +79,7 @@
 			var thisDegree = (currentValue/totalOfValues) * 360;
 			var iLastValue;
 			if((i*35)<=containerHeight){
-				this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,radius,i);
+				this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,radius,i,values[i]);
 				this.drawKey(this,iOriginX,iOriginY,radius,i,i,labels[i],values[i]);
 				var prevDegree = (currentValue/totalOfValues) * 360;
 				iLastValue = i;
@@ -95,13 +95,50 @@
 		};
 	}
 
-	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,thisDegree,prevDegree,radius,i){
+	/* 
+		drawBar
+		Draws a bar chart
+	*/
+
+	Raphael.fn.drawBarChart = function(containerWidth, containerHeight, values, labels, gutter){
+		var container = this.rect(0,0,containerWidth,containerHeight);
+		container.attr({"stroke-width":0});
+
+		var width=(containerWidth-gutter*2);
+		var height=(containerHeight-gutter*2);
+
+		var graphAxis=this.path("M"+gutter+","+gutter+"L"+gutter+","+(height)+"H"+(width));
+
+		var maxValue = Math.ceil(Math.max.apply(Math,values) / 5) * 5;
+		var verticalScale = Math.floor(height/maxValue);
+
+		var barWidth = Math.floor(width/(values.length+1+(values.length/2)));
+		var barSpacing = barWidth/2;
+
+		var barBottom = height;
+		for (var i = 0; i <= values.length-1; i++) {
+			rect=this.rect(((gutter+barSpacing)*(i+1)),(barBottom-(values[i]*verticalScale)),barWidth,values[i]*verticalScale);
+			rect.attr({fill:aColors[i]});
+			$(rect.node).attr('data-value',values[i]);
+			rect.mouseover(function(){
+				glow=this.glow({width:5,fill:true,opacity:0,color:"#000000"});
+			});
+			rect.mouseout(function(){
+				glow.remove();
+			})
+		}
+	}
+
+
+
+	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,thisDegree,prevDegree,radius,i,value){
 		path=graph.path("M"+iOriginX+" "+iOriginY+"L"
 			+(iOriginX+(radius*Math.cos(thisDegree * Math.PI/180)))+" "
 			+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 0 "
 			+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
 			+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
 		path.attr({"fill":"#"+aColors[i],"stroke":"#C0C0C0","stroke-width":1});
+		$(path.node).attr('data-value',value);
 	}
 
 	Raphael.fn.drawKey = function(graph, iOriginX, iOriginY,radius,i,color,label,value){
