@@ -11,6 +11,9 @@
 			margin:20px;
 			width:600px;
 		}
+		/*path{
+			stroke-width:5px;
+		}*/
 	</style>
 </head>
 <body>
@@ -26,7 +29,7 @@
 
 
 	<h3>Bar Chart</h3>
-	<div id="barChart" class="textContainer">
+	<div id="barChart" class="testContainer">
 	</div>
 
 	<script type="text/javascript">
@@ -35,7 +38,6 @@
 		var labels = new Array("One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Tweleve")
 		var pie = paper.drawPie(300,300,100,data,labels);
 		var barPaper = Raphael("barChart",600,300);
-		//function(containerWidth, containerHeight, labels, values, gutter)
 		var barChart = barPaper.drawBarChart(600,300,data,labels,30);
 
 		var lineGraphPaper = Raphael("lineGraph",600,300);
@@ -51,6 +53,13 @@
 			}
 		});
 
+	</script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$('#test path').mouseover({'myValue':$(this).data('value'))},function(myData){
+			alert($(myData.myValue);
+		});
+	});
 	</script>
 </body>
 </html>
