@@ -100,36 +100,53 @@
 		Draws a bar chart
 	*/
 
-	Raphael.fn.drawBarChart = function(containerWidth, containerHeight, values, labels, gutter){
-		var container = this.rect(0,0,containerWidth,containerHeight);
+	Raphael.fn.drawBarChart = function(options){
+		if(typeof options.gutter == 'undefined'){
+			options.gutter = 20;
+		}
+
+		var container = this.rect(0,0,options.containerWidth,options.containerHeight);
 		container.attr({"stroke-width":0});
 
-		var width=(containerWidth-gutter*2);
-		var height=(containerHeight-gutter*2);
+		var width=(options.containerWidth-options.gutter*2);
+		var height=(options.containerHeight-options.gutter*2);
 
-		var graphAxis=this.path("M"+gutter+","+gutter+"L"+gutter+","+(height)+"H"+(width));
+		var graphAxis=this.path("M"+options.gutter+","+options.gutter+"L"+options.gutter+","+(height)+"H"+(width));
 
-		var maxValue = Math.ceil(Math.max.apply(Math,values) / 5) * 5;
+		var aValues = [];
+		for (var i = 0; i <= options.values.length-1; i++){
+			aValues.push(options.values[i].value);
+		}
+		if(typeof options.maxValue == 'undefined'){
+			var maxValue = Math.ceil(Math.max.apply(Math,aValues) / 5) * 5;
+		} else {
+			var maxValue = options.maxValue;
+		}
 		var verticalScale = Math.floor(height/maxValue);
 
-		var barWidth = Math.floor(width/(values.length+1+(values.length/2)));
+		var barWidth = Math.floor(width/(options.values.length+1+(options.values.length/2)));
 		var barSpacing = barWidth/2;
 
 		var barBottom = height;
-		for (var i = 0; i <= values.length-1; i++) {
-			rect=this.rect(((gutter+barSpacing)*(i+1)),(barBottom-(values[i]*verticalScale)),barWidth,values[i]*verticalScale);
-			rect.attr({fill:aColors[i]});
-			$(rect.node).attr('data-value',values[i]);
+		for (var i = 0; i <= options.values.length-1; i++) {
+			rect=this.rect(((options.gutter+barSpacing)*(i+1)),(barBottom-(options.values[i].value*verticalScale)),barWidth,options.values[i].value*verticalScale);
+			if(typeof options.values[i].color === 'undefined'){
+				rect.attr({fill:"#"+aColors[i]});
+			} else {
+				rect.attr({fill:"#"+options.values[i].color});
+			}
+			$(rect.node).attr('data-value',options.values[i].value).attr('data-name',options.values[i].name);
 			rect.mouseover(function(){
 				glow=this.glow({width:5,fill:true,opacity:0,color:"#000000"});
+				if(options.alertInfo){
+					alert($(this.node).data('name') + ': '+$(this.node).data('value'));
+				}
 			});
 			rect.mouseout(function(){
 				glow.remove();
 			})
 		}
 	}
-
-
 
 	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,thisDegree,prevDegree,radius,i,value){
 		path=graph.path("M"+iOriginX+" "+iOriginY+"L"
