@@ -32,11 +32,16 @@
 	<div id="barChart" class="testContainer">
 	</div>
 
+	<h3>Bar Chart - Condensed</h3>
+	<div id="barChartCondensed" class="testContainer">
+	</div>
+
 	<script type="text/javascript">
 		var paper = Raphael("test", 600, 300);
 		var barPaper = Raphael("barChart",600,300);
+		var barPaperCondensed = Raphael("barChartCondensed",300,300);
 		var lineGraphPaper = Raphael("lineGraph",600,300);
-		var values = [{name:"One",value:50,color:'ff0000'},{name:"Two",value:25,color:'00ff00'},{name:"Three",value:25},{name:"Four",value:100},{name:"Five",value:20},{name:"Six",value:40},{name:"Seven",value:50}];
+		var values = [{name:"One",value:50,color:'ff0000'},{name:"Two",value:25,color:'00ff00'},{name:"Three",value:25},{name:"Four",value:100},{name:"Five",value:20},{name:"Six",value:40},{name:"Seven",value:50},{name:"Eight",value:82},{name:"Nine",value:61},{name:"Nine",value:61},{name:"Nine",value:61},{name:"Nine",value:61}];
 
 		var options = {
 			containerWidth: 600,
@@ -44,11 +49,22 @@
 			gutter: 30,
 			values: values,
 			maxValue: 100,
+			showLabels: true
+		}
+
+		var options2 = {
+			containerWidth: 300,
+			containerHeight: 300,
+			gutter: 30,
+			values: values,
+			maxValue: 100,
+			showLabels: true
 		}
 		var data = new Array(50,25,25,100,20,40,25,90,50,40,25,40);
 		var labels = new Array("One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Tweleve")
 		var pie = paper.drawPie(300,300,100,data,labels);
 		var barChart = barPaper.drawBarChart(options);
+		var barChartCond = barPaperCondensed.drawBarChart(options2);
 
 		var ticketsWeekly_stats = new Array();
 		var ticketsWeekly_labels = new Array();
