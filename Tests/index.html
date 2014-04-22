@@ -19,9 +19,11 @@
 </head>
 <body>
 	<h1>Grapher Test Suite</h1>
-	<h3>Pie Chart</h3>
+	<h3>Pie Charts</h3>
 	<div id="test" class="testContainer">
-		
+	</div>
+
+	<div id="pieSmall" class="testContainer">
 	</div>
 
 	<h3>Line Chart</h3>
@@ -39,10 +41,11 @@
 
 	<script type="text/javascript">
 		var paper = Raphael("test", 600, 300);
+		var pieSmallPaper = Raphael("pieSmall", 600, 150);
 		var barPaper = Raphael("barChart",600,300);
 		var barPaperCondensed = Raphael("barChartCondensed",300,300);
 		var lineGraphPaper = Raphael("lineGraph",600,300);
-		var values = [{name:"One",value:50,color:'ff0000'},{name:"Two",value:25,color:'00ff00'},{name:"Three",value:25},{name:"Four",value:100},{name:"Five",value:20},{name:"Six",value:40},{name:"Seven",value:50},{name:"Eight",value:82},{name:"Nine",value:61},{name:"Nine",value:61},{name:"Nine",value:61},{name:"Nine",value:61}];
+		var values = [{name:"One",value:50,color:'ff0000'},{name:"Two",value:25,color:'00ff00'},{name:"Three",value:25},{name:"Four",value:100},{name:"Five",value:20},{name:"Six",value:40},{name:"Seven",value:50},{name:"Eight",value:82},{name:"Nine",value:61},{name:"Ten",value:21},{name:"Eleven",value:61},{name:"Twelve",value:73}];
 
 		var options = {
 			gutter: 30,
@@ -54,7 +57,6 @@
 		var pieOptions = {
 			values: values,
 			showLabels: true,
-			radius:100,
 			//fillColors: 'random' //| gradient | null
 		}
 
@@ -65,6 +67,7 @@
 			showLabels: true
 		}
 		var pie = paper.drawPie(pieOptions);
+		var pie = pieSmallPaper.drawPie(pieOptions);
 		var barChart = barPaper.drawBarChart(options);
 		var barChartCond = barPaperCondensed.drawBarChart(options2);
 

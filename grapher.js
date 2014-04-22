@@ -114,8 +114,10 @@
 	* values = an Array of the objects with the names and values in the order in which they are to be displayed
 	*/
 	Raphael.fn.drawPie = function(options){
+		var widthRatio = 280/this.width;
+		var heightRatio = 280/this.height;
 		var totalOfValues = 0;
-		for (var i = 0; i <= values.length-1; i++) {
+		for (var i = 0; i <= options.values.length-1; i++) {
 			totalOfValues = totalOfValues + (options.values[i].value * 1);
 		};
 		var iOriginX = this.width*0.4;
@@ -123,21 +125,26 @@
 		var prevDegree = 0;
 		var currentValue = 0;
 		var otherValue = 0;
-		aColors = getColorArray(options.fillColors,values.length);
-		for (var i = 0; i <= values.length-1; i++) {
+		aColors = getColorArray(options.fillColors,options.values.length);
+		if(this.width <= this.height){
+			var radius = ((this.width-(75*widthRatio))*widthRatio)/2;
+		} else {
+			var radius = ((this.height-(50*heightRatio))*heightRatio)/2;
+		}
+		for (var i = 0; i <= options.values.length-1; i++) {
 			currentValue = currentValue + (options.values[i].value * 1);
 			var thisDegree = (currentValue/totalOfValues) * 360;
 			var iLastValue;
-			if((i*35)<=this.height){
-				this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,options.radius,i,options.values[i].value);
-				this.drawKey(this,iOriginX,iOriginY,options.radius,i,i,options.values[i].name,options.values[i].value);
+			if((i*32)<=radius*2.5){
+				this.drawSegment(this,iOriginX,iOriginY,parseFloat(thisDegree).toFixed(2),parseFloat(prevDegree).toFixed(2),radius,i,options.values[i].value);
+				this.drawKey(this,iOriginX,iOriginY,radius,i,i,options.values[i].name,options.values[i].value);
 				var prevDegree = (currentValue/totalOfValues) * 360;
 				iLastValue = i;
 			} else {
-				otherValue = otherValue + (values[i].value * 1);
-				if(i == values.length-1){
-					this.drawSegment(this,iOriginX,iOriginY,thisDegree,prevDegree,options.radius,i);
-					this.drawKey(this,iOriginX,iOriginY,options.radius,iLastValue+1,i,"Other",otherValue);
+				otherValue = otherValue + (options.values[i].value * 1);
+				if(i == options.values.length-1){
+					this.drawSegment(this,iOriginX,iOriginY,parseFloat(thisDegree).toFixed(2),parseFloat(prevDegree).toFixed(2),radius,iLastValue+1);
+					this.drawKey(this,iOriginX,iOriginY,radius,iLastValue+1,iLastValue+1,"Other",otherValue);
 					var prevDegree = (currentValue/totalOfValues) * 360;
 				}
 				
@@ -211,20 +218,36 @@
 		}
 	}
 
-	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,thisDegree,prevDegree,radius,i,value){
-		path=graph.path("M"+iOriginX+" "+iOriginY+"L"
-			+(iOriginX+(radius*Math.cos(thisDegree * Math.PI/180)))+" "
-			+(iOriginY+(radius*Math.sin(thisDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 0 "
+	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,currentDegree,prevDegree,radius,i,value){
+		if(currentDegree-prevDegree < 180){
+			path=graph.path("M"+iOriginX+" "+iOriginY+"L"
 			+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
-			+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
-		path.attr({"fill":aColors[i],"stroke":"#C0C0C0","stroke-width":1});
+			+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 1 "
+			+(iOriginX+(radius*Math.cos(currentDegree * Math.PI/180)))+" "
+			+(iOriginY+(radius*Math.sin(currentDegree * Math.PI/180)))+" L"+iOriginX+" "+iOriginY);
+			path.attr({"fill":aColors[i],"stroke":"#C0C0C0","stroke-width":1});
 		$(path.node).attr('data-value',value);
+		} else {
+			drawDegreeHalf = ((+currentDegree - +prevDegree)/2).toFixed(4);
+			pathString = "M"+iOriginX+" "+iOriginY+"L";
+			for (var a = 1; a <= 2; a++) {
+				pathString = pathString+(iOriginX+(radius*Math.cos(prevDegree * Math.PI/180)))+" "
+				+(iOriginY+(radius*Math.sin(prevDegree * Math.PI/180)))+"A"+radius+" "+radius+" 0 0 1 "
+				+(iOriginX+(radius*Math.cos((+prevDegree + +drawDegreeHalf) * Math.PI/180)))+" "
+				+(iOriginY+(radius*Math.sin((+prevDegree + +drawDegreeHalf) * Math.PI/180)));
+				prevDegree = +prevDegree + +drawDegreeHalf;
+					
+			};
+			path=graph.path(pathString+" L"+iOriginX+" "+iOriginY);
+			path.attr({"fill":aColors[i],"stroke":"#C0C0C0","stroke-width":1});
+			$(path.node).attr('data-value',value);
+		}
 	}
 
 	Raphael.fn.drawKey = function(graph, iOriginX, iOriginY,radius,i,color,label,value){
-		var key = this.rect(iOriginX+(radius*1.5)-20,iOriginY-radius+(21*(i))-5,10,10,0);
+		var key = this.rect(iOriginX+(radius*1.4)-20,iOriginY-radius+(21*(i)),10,10,0);
 			key.attr({"fill":aColors[color],"stroke-width":0});
-			var text = this.text(iOriginX+(radius*1.5),iOriginY-radius+(21*(i)),label+ " - "+value);
+			var text = this.text(iOriginX+(radius*1.4),iOriginY-radius+(21*(i))+5,label+ " - "+value);
 			text.attr({"font-size":15,"text-anchor":"start"});
 	}
 
