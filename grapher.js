@@ -61,9 +61,14 @@
 		Takes the following values within an object:
 		values: an Array of objects with attributes 'name' and 'values'
 		gutter - Integer - How much space (in pixels) is required around the graph to fit the labels in on both the left vertical and bottom horizontal axis
+		fill: (optional) Boolean, default false
+		curved: (optional) Boolean, default false
+		class: (optional) A string to fill the 'class' HTML attribute
+		id: (optional) A string to fill the 'id' HTML attribute
 	*/
 	Raphael.fn.drawGraph = function(options){
-
+		options.fill = (typeof options.fill == 'undefined') ? false : true;
+		options.curved = (typeof options.curved == 'undefined') ? false : true;
 		var width=(this.width-options.gutter*2);
 		var height=(this.height-options.gutter*2);
 
@@ -79,6 +84,7 @@
 			var maxValue = options.maxValue;
 		}
 
+		var aMinMax = [height+(options.gutter), options.gutter];
 		var verticalScale = height/maxValue;
 		var pointHorizontalDistance=width/(options.values.length-1);
 
@@ -99,10 +105,40 @@
 		for(var i=0;i<options.values.length;i++){
 			ticketNumbersGraph.push((height-options.values[i].value*verticalScale));
 		}
-		for(var i=1;i<options.values.length;i++){
-			plotString=plotString+"L"+((pointHorizontalDistance*(i))+options.gutter)+","+(ticketNumbersGraph[i]+options.gutter);
+		if(!options.curved){
+			for(var i=1;i<options.values.length;i++){
+				plotString=plotString+"L"+((pointHorizontalDistance*(i))+options.gutter)+","+(ticketNumbersGraph[i]+options.gutter);
+			}
+		} else {
+			ticketNumbersGraph.push(ticketNumbersGraph[ticketNumbersGraph.length-1]);
+			plotString = '';
+			var p0 = {x:pointHorizontalDistance*(0)+options.gutter,y:ticketNumbersGraph[0]+options.gutter};
+			var p2 = {x:pointHorizontalDistance*(1)+options.gutter, y:ticketNumbersGraph[1]+options.gutter};
+			tempAValues = options.values;
+			lastPoints = this.findBezierPoints(p0,p0,p2);
+			a=options.gutter;
+			b=height+options.gutter*2;
+			for(var i=1;i<=options.values.length;i++){
+				var p0 = {x:pointHorizontalDistance*(i-1)+options.gutter,y:ticketNumbersGraph[i-1]+options.gutter};
+				var p1 = {x:pointHorizontalDistance*(i)+options.gutter,y:ticketNumbersGraph[i]+options.gutter};
+				var p2 = {x:pointHorizontalDistance*(i+1)+options.gutter,y:ticketNumbersGraph[i+1]+options.gutter};  
+				points = this.findBezierPoints(p0,p1,p2);
+				a = b =0;
+				plotString=plotString + "C"+ lastPoints.c2.x +","+((options.gutter<lastPoints.c2.y==lastPoints.c2.y<height+options.gutter) ? lastPoints.c2.y : this.closest(aMinMax,lastPoints.c2.y))+" "+points.c1.x+","+((options.gutter<points.c1.y==points.c1.y<height+options.gutter) ? points.c1.y : this.closest(aMinMax,points.c1.y))+" "+(pointHorizontalDistance*(i)+options.gutter)+" "+(ticketNumbersGraph[i]+options.gutter);
+				lastPoints = points;
+			}
 		}
-		var vector=this.path().attr({"stroke-width":3,"stroke-linejoin":"bevel","stroke":"#6D69F1"});
+		var vector=this.path().attr({"stroke-width":3,"stroke-linejoin":"bevel","stroke":"#3060FC"});
+		if(options.fill){
+			plotString = plotString + "V"+(parseInt(height+options.gutter)) + "H"+options.gutter+"Z";			
+		}
+		console.log(plotString);
+		if(typeof options.class != 'undefined'){
+			vector.node.setAttribute("class",options.class);
+		}
+		if(typeof options.id != 'undefined'){
+			vector.node.setAttribute("id",options.id);
+		}
 		vector.animate({path:"M"+options.gutter+","+(ticketNumbersGraph[0]+options.gutter)+plotString});
 	}
 
@@ -120,7 +156,7 @@
 		for (var i = 0; i <= options.values.length-1; i++) {
 			totalOfValues = totalOfValues + (options.values[i].value * 1);
 		};
-		var iOriginX = this.width*0.4;
+		var iOriginX = this.width*0.38;
 		var iOriginY = this.height/2;
 		var prevDegree = 0;
 		var currentValue = 0;
@@ -137,14 +173,14 @@
 			var iLastValue;
 			if((i*32)<=radius*2.5){
 				this.drawSegment(this,iOriginX,iOriginY,parseFloat(thisDegree).toFixed(2),parseFloat(prevDegree).toFixed(2),radius,i,options.values[i].value);
-				this.drawKey(this,iOriginX,iOriginY,radius,i,i,options.values[i].name,options.values[i].value);
+				this.drawKey(iOriginX,iOriginY,radius,i,i,options.values[i].name,options.values[i].value);
 				var prevDegree = (currentValue/totalOfValues) * 360;
 				iLastValue = i;
 			} else {
 				otherValue = otherValue + (options.values[i].value * 1);
 				if(i == options.values.length-1){
 					this.drawSegment(this,iOriginX,iOriginY,parseFloat(thisDegree).toFixed(2),parseFloat(prevDegree).toFixed(2),radius,iLastValue+1);
-					this.drawKey(this,iOriginX,iOriginY,radius,iLastValue+1,iLastValue+1,"Other",otherValue);
+					this.drawKey(iOriginX,iOriginY,radius,iLastValue+1,iLastValue+1,"Other",otherValue);
 					var prevDegree = (currentValue/totalOfValues) * 360;
 				}
 				
@@ -166,7 +202,7 @@
 		var width=(this.width-options.gutter*2);
 		var height=(this.height-options.gutter*2);
 
-		var graphAxis=this.path("M"+options.gutter+","+options.gutter+"L"+options.gutter+","+(height)+"H"+(width));
+		var graphAxis=this.path("M"+options.gutter+","+options.gutter+"V"+(height+options.gutter)+"H"+(width));
 
 		var aValues = [];
 		for (var i = 0; i <= options.values.length-1; i++){
@@ -177,12 +213,12 @@
 		} else {
 			var maxValue = options.maxValue;
 		}
-		var verticalScale = Math.floor(height/maxValue);
+		var verticalScale = (height/maxValue);
 
 		var barWidth = Math.floor(width/(options.values.length+1+(options.values.length/2)));
 		var barSpacing = Math.floor(barWidth/2);
 
-		var barBottom = height;
+		var barBottom = (height+options.gutter);
 		for (var i = 0; i <= options.values.length-1; i++) {
 			rect=this.rect((options.gutter+(barSpacing)*(i+1)+(barWidth*i)),(barBottom-(options.values[i].value*verticalScale)),barWidth,options.values[i].value*verticalScale);
 			var colorString = (typeof options.values[i].color === 'undefined' ? aColors[i] : options.values[i].color );
@@ -218,6 +254,30 @@
 		}
 	}
 
+	/* Math referenced via: http://www.niksula.hut.fi/~hkankaan/Homepages/bezierfast.html */
+	Raphael.fn.findBezierPoints = function(p1,p2,p3){
+		var dx1 = p1.x - p2.x, dy1 = p1.y - p2.y,
+			dx2 = p2.x - p3.x, dy2 = p2.y - p3.y,
+
+		l1 = Math.sqrt(dx1*dx1 + dy1*dy1),
+		l2 = Math.sqrt(dx2*dx2 + dy2+dy2),
+
+		m1 = {x: (p1.x + p2.x) / 2.0, y: (p1.y + p2.y) / 2.0},
+		m2 = {x: (p2.x + p3.x) / 2.0, y: (p2.y + p3.y) / 2.0},
+
+		dxm = (m1.x - m2.x),
+		dym = (m1.y - m2.y),
+
+		k = l2 / (l1 + l2),
+		cm = {x: m2.x + dxm*k, y: m2.y + dym*k},
+		tx = p2.x - cm.x, ty = p2.y - cm.y,
+
+		c1 = {x: m1.x + tx, y: m1.y + ty},
+		c2 = {x: m2.x + tx, y: m2.y + ty};
+
+		return {c1: c1, c2: c2, l1: Math.floor(l1), l2: Math.floor(l2)};
+	}
+
 	Raphael.fn.drawSegment = function(graph,iOriginX,iOriginY,currentDegree,prevDegree,radius,i,value){
 		if(currentDegree-prevDegree < 180){
 			path=graph.path("M"+iOriginX+" "+iOriginY+"L"
@@ -244,11 +304,12 @@
 		}
 	}
 
-	Raphael.fn.drawKey = function(graph, iOriginX, iOriginY,radius,i,color,label,value){
-		var key = this.rect(iOriginX+(radius*1.4)-20,iOriginY-radius+(21*(i)),10,10,0);
+	Raphael.fn.drawKey = function(iOriginX,iOriginY,radius,i,color,label,value){
+		var factor = 1;
+		var key = this.rect(iOriginX+(radius+30*factor)-20,iOriginY-radius+(21*(i)),10*factor,10*factor,0);
 			key.attr({"fill":aColors[color],"stroke-width":0});
-			var text = this.text(iOriginX+(radius*1.4),iOriginY-radius+(21*(i))+5,label+ " - "+value);
-			text.attr({"font-size":15,"text-anchor":"start"});
+			var text = this.text(iOriginX+(radius+30*factor),iOriginY-radius+(21*(i))+5,label+ " - "+value);
+			text.attr({"font-size":15*factor,"text-anchor":"start"});
 	}
 
 	/* Raphael function to draw a grid for the graph */
@@ -267,3 +328,18 @@
 			path.attr("stroke","#818181");
 		}
 	}
+
+Raphael.fn.closest = function(array,num){
+  var i=0;
+  var minDiff=1000;
+  var ans;
+  for(i in array){
+		var m=Math.abs(num-array[i]);
+		if(m<minDiff){ 
+		      minDiff=m; 
+		      ans=array[i]; 
+		}
+	}
+  return ans;
+}
+ 
